@@ -10,8 +10,7 @@ on:
 
 env:
   DOCKER_REGISTRY: ghcr.io
-  IMAGE_NAME: baboon-co/iron-forge/api-gateway
-  REGISTRY_IMAGE_NAME: $DOCKER_REGISTRY/$IMAGE_NAME
+  REGISTRY_IMAGE_NAME: ghcr.io/baboon-co/iron-forge/api-gateway
 
 jobs:
   build-and-publish:
