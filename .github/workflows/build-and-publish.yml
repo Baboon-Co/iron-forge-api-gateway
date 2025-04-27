@@ -38,7 +38,7 @@ jobs:
         run: docker build -t $REGISTRY_IMAGE_NAME:${{ steps.versioning.outputs.new_version }} .
 
       - name: Tag as 'latest'
-        run: docker tag $REGISTRY_IMAGE_NAME:${{ steps.versioning.outputs.new_version }} $REGISTRY_IMAGE_NAME::latest
+        run: docker tag $REGISTRY_IMAGE_NAME:${{ steps.versioning.outputs.new_version }} $REGISTRY_IMAGE_NAME:latest
 
       - name: Push image to registry
         run: |
