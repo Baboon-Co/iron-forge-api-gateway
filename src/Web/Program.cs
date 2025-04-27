@@ -1,17 +1,25 @@
+using Scalar.AspNetCore;
+
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Services.AddAuthentication()
+    .AddJwtBearer();
+builder.Services.AddAuthorization();
+builder.Services.AddControllers();
+
 builder.Services.AddOpenApi();
-builder.Services.AddReverseProxy()
-    .LoadFromConfig(builder.Configuration.GetRequiredSection("ReverseProxy"));
 
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
+    app.MapScalarApiReference("/api-docs");
 }
 
 app.UseHttpsRedirection();
+app.UseRouting();
 
-app.MapReverseProxy();
+app.MapControllers();
+
 app.Run();
