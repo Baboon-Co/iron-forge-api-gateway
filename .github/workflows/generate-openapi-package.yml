@@ -46,6 +46,7 @@ jobs:
           openapi-generator-cli generate \
             -g typescript-axios \
             --additional-properties=npmName=@${{ github.repository_owner }}/${{ env.PACKAGE_REPO }} \
+            --additional-properties=npmVersion=${{ needs.build-and-publish.outputs.new_version_raw }} \
             -i ./src/Web/generated/openapi/openapi.json \
             -o ./generated-typescript \
             --git-user-id=${{ env.PACKAGE_USER }} \
@@ -55,6 +56,6 @@ jobs:
         run: |
           cd ./generated-typescript
           npm i
-          npm publish --registry=${{ env.REGISTRY }}
+          npm publish --registry=${{ env.REGISTRY }} --latest
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
