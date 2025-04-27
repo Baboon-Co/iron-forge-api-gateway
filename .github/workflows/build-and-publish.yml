@@ -46,7 +46,7 @@ jobs:
           docker push $REGISTRY_IMAGE_NAME:latest
 
       - name: Save openapi spec as artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: openapi
           path: ./generated/openapi/openapi.json     
