@@ -45,7 +45,7 @@ jobs:
         run: |
           openapi-generator-cli generate \
             -g typescript-axios \
-            --additional-properties=npmName=@${{ github.repository_owner }}/${{ github.event.repository.name }} \
+            --additional-properties=npmName=@${{ github.repository_owner }}/${{ env.PACKAGE_REPO }} \
             -i ./src/Web/generated/openapi/openapi.json \
             -o ./generated-typescript \
             --git-user-id=${{ env.PACKAGE_USER }} \
