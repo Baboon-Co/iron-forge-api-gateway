@@ -20,11 +20,8 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4.1.2
 
-      - name: Download openapi artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: openapi
-          path: openapi.json
+      - name: Build project and generate OpenAPI
+        run: dotnet build src/Web/Web.csproj --configuration Release
 
       - name: Install Node.js
         uses: actions/setup-node@v4
@@ -44,7 +41,7 @@ jobs:
           openapi-generator-cli generate \
             -g typescript-axios \
             --additional-properties=npmName=@${{ github.repository_owner }}/${{ github.event.repository.name }} \
-            -i openapi.json \
+            -i ./src/Web/generated/openapi/openapi.json \
             -o ./generated-typescript \
             --git-user-id=${{ env.PACKAGE_USER }} \
             --git-repo-id=${{ github.event.repository.name }}
