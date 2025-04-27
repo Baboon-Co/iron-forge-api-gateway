@@ -1,4 +1,4 @@
-name: Build and publish docker-image
+﻿name: Build and publish docker-image
 
 on:
   push:
@@ -11,6 +11,10 @@ on:
 env:
   DOCKER_REGISTRY: ghcr.io
   REGISTRY_IMAGE_NAME: ghcr.io/baboon-co/iron-forge/api-gateway
+
+  NPM_REGISTRY: https://npm.pkg.github.com/
+  NPM_PACKAGE_USER: baboon-co
+  NPM_PACKAGE_REPO: iron-forge-api-gateway
 
 jobs:
   build-and-publish:
@@ -48,3 +52,53 @@ jobs:
         run: |
           docker push $REGISTRY_IMAGE_NAME:${{ steps.versioning.outputs.new_version }}
           docker push $REGISTRY_IMAGE_NAME:latest
+  
+  generate-openapi:
+    runs-on: ubuntu-latest
+    needs: [ build-and-publish ]
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4.1.2
+
+      - name: Setup .NET 9
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 9.0.x
+
+      - name: Build project and generate OpenAPI
+        run: dotnet build src/Web/Web.csproj --configuration Release
+
+      - name: Install Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          registry-url: ${{ env.NPM_REGISTRY }}
+
+      - name: Install OpenAPI-generator
+        run: npm install -g @openapitools/openapi-generator-cli
+
+      - name: Create typescript-client folder
+        run: mkdir -p ./generated-typescript
+
+      - name: Generate typescript-client
+        shell: bash
+        run: |
+          openapi-generator-cli generate \
+            -g typescript-axios \
+            --additional-properties=npmName=@${{ github.repository_owner }}/${{ env.NPM_PACKAGE_REPO }} \
+            --additional-properties=npmVersion=${{ needs.build-and-publish.outputs.new_version_raw }} \
+            -i ./src/Web/generated/openapi/openapi.json \
+            -o ./generated-typescript \
+            --git-user-id=${{ env.NPM_PACKAGE_USER }} \
+            --git-repo-id=${{ github.event.repository.name }}
+
+      - name: Publish typescript-client package
+        run: |
+          cd ./generated-typescript
+          npm i
+          npm publish --registry=${{ env.NPM_REGISTRY }} --latest
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
