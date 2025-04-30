@@ -70,6 +70,8 @@ jobs:
 
       - name: Build project and generate OpenAPI
         run: dotnet build src/Web/Web.csproj --configuration Release
+        env:
+          GENERATE_OPENAPI: true
 
       - name: Install Node.js
         uses: actions/setup-node@v4

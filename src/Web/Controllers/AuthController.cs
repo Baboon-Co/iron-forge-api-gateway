@@ -1,45 +1,25 @@
-﻿using Application.Dto;
+﻿using Application.Features.Authentication.Abstractions;
+using Application.Features.Authentication.Login;
+using Application.Features.Authentication.Register;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Web.Controllers;
 
-internal record User(string Username, string Login, string Password);
-
 [ApiController]
 [Route("/api/auth")]
-public class AuthController : ControllerBase
+public class AuthController(IAuthService authService) : ControllerBase
 {
-    private static readonly List<User> _users = [];
-
-    private AuthTokensResponseDto CreateTokens(User user)
-    {
-        return new AuthTokensResponseDto(
-            $"{user.Username}+{user.Login.GetHashCode()}",
-            $"{user.Username}+{user.Username.GetHashCode()}");
-    }
-
     [HttpPost("register")]
-    public async Task<ActionResult<AuthTokensResponseDto>> Register(RegisterRequestDto requestDto)
+    public async Task<ActionResult<RegisterResponse>> Register(RegisterRequest request, CancellationToken ct)
     {
-        var user = new User(requestDto.Username, requestDto.Login, requestDto.Password);
-
-        if (_users.Any(x => x.Login == user.Login))
-            return Conflict($"User with login ${user.Login} already exists.");
-
-        _users.Add(user);
-
-        var response = CreateTokens(user);
+        var response = await authService.RegisterAsync(request, ct);
         return Created("/api/users/{user.Username}", response);
     }
 
     [HttpPost("login")]
-    public ActionResult<string> Login(LoginRequestDto requestDto)
+    public async Task<ActionResult<LoginResponse>> Login(LoginRequest request, CancellationToken ct)
     {
-        var user = _users.FirstOrDefault(x => x.Login == requestDto.Login);
-        if (user is null || user.Password != requestDto.Password)
-            return Unauthorized("Login or password is incorrect.");
-
-        var response = CreateTokens(user);
+        var response = await authService.LoginAsync(request, ct);
         return Ok(response);
     }
 
@@ -50,26 +30,12 @@ public class AuthController : ControllerBase
     }
 
     [HttpPost("refresh")]
-    public ActionResult<string> Refresh()
+    public async Task<ActionResult<string>> Refresh(CancellationToken ct)
     {
-        return Ok();
-    }
+        if (!HttpContext.Request.Cookies.TryGetValue("refresh_token", out var refreshToken))
+            return Unauthorized("Refresh token not found.");
 
-    [HttpGet("test")]
-    public ActionResult<string> Get()
-    {
-        var token = HttpContext.Request.Headers.Authorization.ToString().Replace("Bearer ", "");
-        var username = token.Split('+');
-        if (username.Length < 2)
-            return Forbid();
-
-        var user = _users.FirstOrDefault(x => x.Username == username[0]);
-        if (user is null)
-            return Forbid();
-
-        if (user.Login.GetHashCode().ToString() != username[1])
-            return Forbid();
-
-        return Ok("Success");
+        var response = await authService.RefreshTokenAsync(refreshToken, ct);
+        return Ok(response);
     }
 }

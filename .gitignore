@@ -35,6 +35,7 @@ obj/
 TestResults/
 Logs/
 data/
+/src/Web/generated/
 
 ###################
 # Web publish log #
