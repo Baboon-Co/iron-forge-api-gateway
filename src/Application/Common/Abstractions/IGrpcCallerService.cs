@@ -1,8 +1,10 @@
-﻿namespace Application.Abstractions;
+﻿using FluentResults;
+
+namespace Application.Common.Abstractions;
 
 public interface IGrpcCallerService
 {
-    Task<TResponse> CallAsync<TRequest, TResponse>(
+    Task<Result<TResponse>> CallAsync<TRequest, TResponse>(
         Func<TRequest, Task<TResponse>> grpcCall,
         TRequest request,
         string operationName = "gRPC call")

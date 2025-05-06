@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Web.Infrastructure;
+namespace Api.Infrastructure;
 
 public class GlobalExceptionHandler(ILogger<GlobalExceptionHandler> logger) : IExceptionHandler
 {
@@ -17,7 +17,7 @@ public class GlobalExceptionHandler(ILogger<GlobalExceptionHandler> logger) : IE
             Type = "https://tools.ietf.org/html/rfc7231#section-6.6.1",
             Status = StatusCodes.Status500InternalServerError,
             Title = "An error occurred while processing your request.",
-            Detail = exception.Message,
+            Detail = "Dwarves had broken something inside the server. If you are a developer, you are allowed to read further: " + exception.Message,
         };
 
         httpContext.Response.StatusCode = problemDetails.Status.Value;

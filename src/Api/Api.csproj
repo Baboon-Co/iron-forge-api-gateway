@@ -14,8 +14,9 @@
     </Target>
     
     <ItemGroup>
-        <PackageReference Include="auth-service.client" Version="0.0.4" />
+        <PackageReference Include="auth-service.client" Version="0.0.8" />
         <PackageReference Include="FluentResults" Version="3.16.0" />
+        <PackageReference Include="FluentResults.Extensions.AspNetCore" Version="0.1.0" />
         <PackageReference Include="Grpc.Net.Client" Version="2.71.0" />
         <PackageReference Include="Grpc.Net.ClientFactory" Version="2.71.0" />
         <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="9.0.4"/>

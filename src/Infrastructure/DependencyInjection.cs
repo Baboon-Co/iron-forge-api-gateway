@@ -1,4 +1,4 @@
-﻿using Application.Abstractions;
+﻿using Application.Common.Abstractions;
 using Application.Features.Authentication.Abstractions;
 using Infrastructure.Features.Authentication;
 using Infrastructure.Grpc;

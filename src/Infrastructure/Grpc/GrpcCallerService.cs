@@ -1,11 +1,13 @@
-﻿using Application.Abstractions;
+﻿using Application.Common.Abstractions;
+using Application.Errors;
+using FluentResults;
+using Google.Rpc;
 using Grpc.Core;
+using Microsoft.Extensions.Logging;
 using Polly;
 using Polly.Retry;
 
 namespace Infrastructure.Grpc;
-
-using Microsoft.Extensions.Logging;
 
 public class GrpcCallerService : IGrpcCallerService
 {
@@ -30,7 +32,7 @@ public class GrpcCallerService : IGrpcCallerService
                 });
     }
 
-    public async Task<TResponse> CallAsync<TRequest, TResponse>(
+    public async Task<Result<TResponse>> CallAsync<TRequest, TResponse>(
         Func<TRequest, Task<TResponse>> grpcCall,
         TRequest request,
         string operationName = "gRPC call")
@@ -43,15 +45,45 @@ public class GrpcCallerService : IGrpcCallerService
         }
         catch (RpcException ex)
         {
-            _logger.LogError(ex, "[gRPC] {Operation} failed: {Status} {Detail}",
+            _logger.LogDebug(ex, "[gRPC] {Operation} failed: {Status} {Detail}",
                 operationName, ex.StatusCode, ex.Status.Detail);
-
-            throw new ApplicationException($"[gRPC] {operationName} failed: {ex.Status.Detail}");
+            
+            return ParseGrpcErrors(ex);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "[gRPC] {Operation} failed with unexpected error", operationName);
             throw;
         }
+    }
+
+    private static Result ParseGrpcErrors(RpcException ex)
+    {
+        var status = ex.GetRpcStatus();
+        if (status is null)
+            throw new InvalidOperationException("[gRPC] Could not parse gRPC status because it is null.");
+
+        var errors = new List<Error> {new GrpcResultError {StatusCode = ex.StatusCode}};
+        foreach (var detail in status.Details)
+        {
+            if (detail.Is(BadRequest.Descriptor))
+            {
+                var badRequest = detail.Unpack<BadRequest>();
+                var validationErrors = badRequest.FieldViolations
+                    .Select(fv => new ValidationError(fv.Field, fv.Description));
+                errors.AddRange(validationErrors);
+            }
+            else if (detail.Is(ErrorInfo.Descriptor))
+            {
+                var info = detail.Unpack<ErrorInfo>();
+                errors.Add(new ErrorInfoError(
+                    info.Reason,
+                    info.Domain
+                ).WithMetadata(info.Metadata
+                    .ToDictionary(kv => kv.Key, m => (object) m.Value)));
+            }
+        }
+
+        return Result.Fail(errors);
     }
 }

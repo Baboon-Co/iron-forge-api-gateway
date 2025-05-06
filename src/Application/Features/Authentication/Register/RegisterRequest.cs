@@ -7,7 +7,6 @@ namespace Application.Features.Authentication.Register;
 
 [SwaggerSchemaFilter(typeof(RegisterRequestSchemaFilter))]
 public record RegisterRequest(
-    string Username,
     string Login,
     string Password
 );
@@ -18,7 +17,6 @@ internal class RegisterRequestSchemaFilter : ISchemaFilter
     {
         schema.Example = new OpenApiObject
         {
-            ["username"] = new OpenApiString("Alpaca"),
             ["login"] = new OpenApiString("alpaca"),
             ["password"] = new OpenApiString("cake"),
         };

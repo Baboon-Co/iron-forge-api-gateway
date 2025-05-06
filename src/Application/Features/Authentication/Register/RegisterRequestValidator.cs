@@ -7,7 +7,6 @@ internal class RegisterRequestValidator : AbstractValidator<RegisterRequest>
 {
     public RegisterRequestValidator()
     {
-        RuleFor(r => r.Username).Username();
         RuleFor(r => r.Login).Login();
         RuleFor(r => r.Password).Password();
     }

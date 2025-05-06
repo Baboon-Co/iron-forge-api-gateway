@@ -1,9 +1,11 @@
 ﻿using Application.Features.Users.GetProfile;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Web.Controllers;
+namespace Api.Controllers;
 
 [ApiController]
+[Authorize]
 [Route("/api/users")]
 public class UsersController : ControllerBase
 {
