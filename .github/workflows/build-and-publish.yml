@@ -18,6 +18,9 @@ env:
 
 jobs:
   build-and-publish:
+    permissions:
+      contents: read
+      packages: write
     outputs:
       new_version: ${{ steps.versioning.outputs.new_version }}
       new_version_raw: ${{ steps.versioning.outputs.new_version_raw }}
@@ -43,7 +46,7 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build image
-        run: docker build -t $REGISTRY_IMAGE_NAME:${{ steps.versioning.outputs.new_version }} .
+        run: docker build --build-arg NUGET_USERNAME=${{ github.actor }} --build-arg NUGET_PASSWORD=${{ secrets.GITHUB_TOKEN }} -t $REGISTRY_IMAGE_NAME:${{ steps.versioning.outputs.new_version }} .
 
       - name: Tag as 'latest'
         run: docker tag $REGISTRY_IMAGE_NAME:${{ steps.versioning.outputs.new_version }} $REGISTRY_IMAGE_NAME:latest

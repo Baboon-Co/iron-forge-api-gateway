@@ -6,8 +6,13 @@ EXPOSE 5001
 
 FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 ARG BUILD_CONFIGURATION=Release
+ARG NUGET_USERNAME
+ARG NUGET_PASSWORD
+RUN dotnet nuget add source "https://nuget.pkg.github.com/baboon-co/index.json" -n "Baboon and Co" --username $NUGET_USERNAME --password $NUGET_PASSWORD --store-password-in-clear-text
 WORKDIR /src
 COPY ["src/Api/Api.csproj", "src/Api/"]
+COPY ["src/Application/Application.csproj", "src/Application/"]
+COPY ["src/Infrastructure/Infrastructure.csproj", "src/Infrastructure/"]
 RUN dotnet restore "src/Api/Api.csproj"
 COPY . .
 WORKDIR "/src/src/Api"
