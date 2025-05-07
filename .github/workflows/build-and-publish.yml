@@ -72,7 +72,7 @@ jobs:
           dotnet-version: 9.0.x
 
       - name: Build project and generate OpenAPI
-        run: dotnet build src/Web/Web.csproj --configuration Release
+        run: dotnet build src/Api/Api.csproj --configuration Release
         env:
           GENERATE_OPENAPI: true
 
@@ -95,7 +95,7 @@ jobs:
             -g typescript-axios \
             --additional-properties=npmName=@${{ github.repository_owner }}/${{ env.NPM_PACKAGE_REPO }} \
             --additional-properties=npmVersion=${{ needs.build-and-publish.outputs.new_version_raw }} \
-            -i ./src/Web/generated/openapi/openapi.json \
+            -i ./src/Api/generated/openapi/openapi.json \
             -o ./generated-typescript \
             --git-user-id=${{ env.NPM_PACKAGE_USER }} \
             --git-repo-id=${{ github.event.repository.name }}
