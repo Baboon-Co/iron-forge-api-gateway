@@ -33,18 +33,6 @@
     </ItemGroup>
 
     <ItemGroup>
-        <Content Include="..\..\Dockerfile">
-            <Link>Dockerfile</Link>
-        </Content>
-        <Content Include="..\..\.dockerignore">
-            <Link>.dockerignore</Link>
-        </Content>
-        <Content Include="..\..\.gitignore">
-            <Link>.gitignore</Link>
-        </Content>
-    </ItemGroup>
-
-    <ItemGroup>
         <ProjectReference Include="..\Application\Application.csproj"/>
         <ProjectReference Include="..\Infrastructure\Infrastructure.csproj" />
     </ItemGroup>
