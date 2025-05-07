@@ -11,7 +11,7 @@
         <Message Text="Генерация openapi.json (GENERATE_OPENAPI=$(GENERATE_OPENAPI))" Importance="high"/>
         <MakeDir Directories="generated/openapi"/>
         <Exec Command="dotnet swagger tofile --output generated/openapi/openapi.json $(OutputPath)$(AssemblyName).dll v1"
-              EnvironmentVariables="Jwt__Secret=JWT_SECRET_FOR_OPENAPI_GENERATION;Jwt__Issuer=IronForge-AuthService;Jwt__Audience=IronForge-Frontend;SERVICES__AUTHSERVICEADDRESS: http://auth-service:5102"/>
+              EnvironmentVariables="Jwt__Secret=JWT_SECRET_FOR_OPENAPI_GENERATION;Jwt__Issuer=IronForge-AuthService;Jwt__Audience=IronForge-Frontend;SERVICES__AUTHSERVICEADDRESS=http://auth-service:5102"/>
     </Target>
 
     <ItemGroup>
