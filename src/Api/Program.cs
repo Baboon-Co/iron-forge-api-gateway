@@ -13,11 +13,8 @@ builder.Services.AddInfrastructure();
 // Application
 var app = builder.Build();
 
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger(options => options.RouteTemplate = "/openapi/{documentName}.json");
-    app.MapScalarApiReference("/api-docs");
-}
+app.UseSwagger(options => options.RouteTemplate = "/openapi/{documentName}.json");
+app.MapScalarApiReference("/api-docs");
 
 app.UseStatusCodePages();
 
