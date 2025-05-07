@@ -19,7 +19,7 @@ env:
 jobs:
   build-and-publish:
     permissions:
-      contents: read
+      contents: write
       packages: write
     outputs:
       new_version: ${{ steps.versioning.outputs.new_version }}
