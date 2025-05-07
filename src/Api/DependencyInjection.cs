@@ -52,7 +52,12 @@ public static class DependencyInjection
 
     private static void AddMicroservices(IServiceCollection services)
     {
-        services.AddGrpcClient<Auth.AuthClient>(options => { options.Address = new Uri("http://localhost:5102"); });
+        services.AddOptionsWithFluentValidation<ServicesOptions>();
+        services.AddGrpcClient<Auth.AuthClient>((provider, options) =>
+        {
+            var servicesOptions = provider.GetRequiredService<ServicesOptions>();
+            options.Address = new Uri(servicesOptions.AuthServiceAddress);
+        });
     }
 
     private static void AddServices(IServiceCollection services)
