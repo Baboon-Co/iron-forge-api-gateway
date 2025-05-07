@@ -17,7 +17,7 @@ public static class DependencyInjection
         services.AddValidatorsFromAssembly(typeof(DependencyInjection).Assembly);
 
         AddAuth(services, configuration);
-        AddMicroservices(services);
+        AddMicroservices(services, configuration);
         AddServices(services);
         AddOpenApiDocs(services);
 
@@ -50,12 +50,12 @@ public static class DependencyInjection
         services.AddAuthorization();
     }
 
-    private static void AddMicroservices(IServiceCollection services)
+    private static void AddMicroservices(IServiceCollection services, IConfiguration configuration)
     {
         services.AddOptionsWithFluentValidation<ServicesOptions>();
-        services.AddGrpcClient<Auth.AuthClient>((provider, options) =>
+        services.AddGrpcClient<Auth.AuthClient>(options =>
         {
-            var servicesOptions = provider.GetRequiredService<ServicesOptions>();
+            var servicesOptions = configuration.GetRequired<ServicesOptions>();
             options.Address = new Uri(servicesOptions.AuthServiceAddress);
         });
     }
