@@ -1,5 +1,5 @@
-﻿using Api.Common.Abstractions;
-using FluentValidation;
+﻿using FluentValidation;
+using Utility.Configuration.Options.Abstractions;
 
 namespace Api.Options;
 

@@ -1,5 +1,4 @@
 ﻿using System.Text;
-using Api.Extensions;
 using Api.Infrastructure;
 using Api.Options;
 using FluentValidation;
@@ -7,6 +6,7 @@ using IronForge.Contracts.AuthService;
 using Microsoft.IdentityModel.Tokens;
 using SharpGrip.FluentValidation.AutoValidation.Mvc.Extensions;
 using Swashbuckle.AspNetCore.Filters;
+using Utility.Configuration.Options;
 
 namespace Api;
 
