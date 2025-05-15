@@ -1,6 +1,6 @@
 ﻿using FluentResults;
 
-namespace Application.Errors;
+namespace Application.Common.Errors;
 
 public class ValidationError(string field, string message) : Error(message)
 {

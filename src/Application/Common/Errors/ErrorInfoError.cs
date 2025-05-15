@@ -1,6 +1,6 @@
 ﻿using FluentResults;
 
-namespace Application.Errors;
+namespace Application.Common.Errors;
 
 public class ErrorInfoError(string reason, string domain) : Error(reason)
 {

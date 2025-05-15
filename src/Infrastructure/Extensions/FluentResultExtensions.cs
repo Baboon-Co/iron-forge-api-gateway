@@ -1,4 +1,4 @@
-﻿using Application.Errors;
+﻿using Application.Common.Errors;
 using FluentResults;
 using Infrastructure.Grpc;
 

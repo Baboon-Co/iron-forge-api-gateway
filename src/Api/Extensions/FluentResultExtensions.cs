@@ -1,4 +1,5 @@
-﻿using Application.Errors;
+﻿using System.Net;
+using Application.Common.Errors;
 using FluentResults;
 
 namespace Api.Extensions;
@@ -15,7 +16,7 @@ public static class FluentResultExtensions
                 g => g.Select(e => e.Message).ToArray()
             );
     }
-    
+
     public static RequestError GetRequestError<T>(this Result<T> result)
     {
         return result.Errors.OfType<RequestError>().First();

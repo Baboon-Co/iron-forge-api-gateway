@@ -1,6 +1,6 @@
 ﻿using FluentResults;
 
-namespace Application.Common.Abstractions;
+namespace Infrastructure.Grpc.Abstractions;
 
 public interface IGrpcCallerService
 {

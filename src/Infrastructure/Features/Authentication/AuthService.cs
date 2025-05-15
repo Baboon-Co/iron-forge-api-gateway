@@ -1,10 +1,10 @@
 ﻿using System.Net;
-using Application.Common.Abstractions;
-using Application.Errors;
+using Application.Common.Errors;
 using Application.Features.Authentication.Abstractions;
 using FluentResults;
 using Grpc.Core;
 using Infrastructure.Extensions;
+using Infrastructure.Grpc.Abstractions;
 using IronForge.Contracts.AuthService;
 using LoginRequest = Application.Features.Authentication.Login.LoginRequest;
 using LoginResponse = Application.Features.Authentication.Login.LoginResponse;

@@ -1,8 +1,8 @@
-﻿using Application.Common.Abstractions;
-using Application.Errors;
+﻿using Application.Common.Errors;
 using FluentResults;
 using Google.Rpc;
 using Grpc.Core;
+using Infrastructure.Grpc.Abstractions;
 using Microsoft.Extensions.Logging;
 using Polly;
 using Polly.Retry;

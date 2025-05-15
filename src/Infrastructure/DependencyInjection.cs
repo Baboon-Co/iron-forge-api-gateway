@@ -1,7 +1,7 @@
-﻿using Application.Common.Abstractions;
-using Application.Features.Authentication.Abstractions;
+﻿using Application.Features.Authentication.Abstractions;
 using Infrastructure.Features.Authentication;
 using Infrastructure.Grpc;
+using Infrastructure.Grpc.Abstractions;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Infrastructure;
