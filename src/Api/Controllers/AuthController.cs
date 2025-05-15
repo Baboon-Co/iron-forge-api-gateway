@@ -1,8 +1,8 @@
-﻿using Application.Errors;
+﻿using System.Net;
+using Api.Extensions;
 using Application.Features.Authentication.Abstractions;
 using Application.Features.Authentication.Login;
 using Application.Features.Authentication.Register;
-using Infrastructure.Grpc;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Api.Controllers;
@@ -19,16 +19,9 @@ public class AuthController(IAuthService authService) : ControllerBase
         if (authResult.IsSuccess)
             return StatusCode(StatusCodes.Status201Created, authResult.Value);
 
-        var validationErrors = authResult.Errors
-            .OfType<ValidationError>()
-            .GroupBy(e => e.Field)
-            .ToDictionary(
-                g => g.Key,
-                g => g.Select(e => e.Message).ToArray()
-            );
-
-        var grpcError = authResult.Errors.OfType<GrpcResultError>().First();
-        if (grpcError.StatusCode == Grpc.Core.StatusCode.AlreadyExists)
+        var validationErrors = authResult.ToValidationErrorsDictionary();
+        var requestError = authResult.GetRequestError();
+        if (requestError.StatusCode == HttpStatusCode.Conflict)
             return Conflict(new ValidationProblemDetails(validationErrors));
 
         return BadRequest(new ValidationProblemDetails(validationErrors));

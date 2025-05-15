@@ -9,6 +9,8 @@
     <ItemGroup>
       <PackageReference Include="BaboonCo.AuthService.Client" Version="0.0.3" />
       <PackageReference Include="FluentResults" Version="3.16.0" />
+      <PackageReference Include="Grpc.Net.Client" Version="2.71.0" />
+      <PackageReference Include="Grpc.Net.ClientFactory" Version="2.71.0" />
       <PackageReference Include="Grpc.StatusProto" Version="2.71.0" />
       <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="9.0.4" />
       <PackageReference Include="Polly" Version="8.5.2" />

@@ -1,6 +1,10 @@
-﻿using Application.Common.Abstractions;
+﻿using System.Net;
+using Application.Common.Abstractions;
+using Application.Errors;
 using Application.Features.Authentication.Abstractions;
 using FluentResults;
+using Grpc.Core;
+using Infrastructure.Extensions;
 using IronForge.Contracts.AuthService;
 using LoginRequest = Application.Features.Authentication.Login.LoginRequest;
 using LoginResponse = Application.Features.Authentication.Login.LoginResponse;
@@ -31,7 +35,14 @@ public class AuthService(
             "Register");
 
         if (rpcResponseResult.IsFailed)
-            return rpcResponseResult.ToResult();
+        {
+            var requestResult = rpcResponseResult.ToValidationErrorsResult();
+            var grpcError = rpcResponseResult.GetGrpcResultError();
+            if (grpcError.StatusCode == StatusCode.AlreadyExists)
+                requestResult.WithError(new RequestError("User already exists.", HttpStatusCode.Conflict));
+
+            return requestResult;
+        }
 
         var rpcResponse = rpcResponseResult.Value;
         return new RegisterResponse(
