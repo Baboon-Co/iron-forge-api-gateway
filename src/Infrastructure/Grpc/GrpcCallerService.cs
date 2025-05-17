@@ -19,16 +19,16 @@ public class GrpcCallerService : IGrpcCallerService
         _logger = logger;
 
         _retryPolicy = Policy
-            .Handle<RpcException>(ex => ex.StatusCode
+            .Handle<RpcException>(e => e.StatusCode
                 is StatusCode.Unavailable
                 or StatusCode.DeadlineExceeded)
             .WaitAndRetryAsync(
                 retryCount: 3,
                 sleepDurationProvider: attempt => TimeSpan.FromMilliseconds(300 * attempt),
-                onRetry: (ex, ts, retryCount, _) =>
+                onRetry: (e, ts, retryCount, _) =>
                 {
-                    logger.LogWarning(ex, "[gRPC] Retry {RetryCount} after {Delay}ms: {Message}",
-                        retryCount, ts.TotalMilliseconds, ex.Message);
+                    logger.LogWarning(e, "[gRPC] Retry {RetryCount} after {Delay}ms: {Message}",
+                        retryCount, ts.TotalMilliseconds, e.Message);
                 });
     }
 
@@ -43,27 +43,27 @@ public class GrpcCallerService : IGrpcCallerService
         {
             return await _retryPolicy.ExecuteAsync(() => grpcCall(request));
         }
-        catch (RpcException ex)
+        catch (RpcException e)
         {
-            _logger.LogDebug(ex, "[gRPC] {Operation} failed: {Status} {Detail}",
-                operationName, ex.StatusCode, ex.Status.Detail);
+            _logger.LogInformation(e, "[gRPC] {Operation} failed: {Status} {Detail}",
+                operationName, e.StatusCode, e.Status.Detail);
             
-            return ParseGrpcErrors(ex);
+            return ParseGrpcErrors(e);
         }
-        catch (Exception ex)
+        catch (Exception e)
         {
-            _logger.LogError(ex, "[gRPC] {Operation} failed with unexpected error", operationName);
+            _logger.LogError(e, "[gRPC] {Operation} failed with unexpected error", operationName);
             throw;
         }
     }
 
-    private static Result ParseGrpcErrors(RpcException ex)
+    private static Result ParseGrpcErrors(RpcException e)
     {
-        var status = ex.GetRpcStatus();
+        var status = e.GetRpcStatus();
         if (status is null)
             throw new InvalidOperationException("[gRPC] Could not parse gRPC status because it is null.");
 
-        var errors = new List<Error> {new GrpcResultError {StatusCode = ex.StatusCode}};
+        var errors = new List<Error> {new GrpcResultError {StatusCode = e.StatusCode}};
         foreach (var detail in status.Details)
         {
             if (detail.Is(BadRequest.Descriptor))

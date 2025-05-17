@@ -1,11 +1,11 @@
-﻿using System.Net;
-using Application.Common.Errors;
-using Application.Features.Authentication.Abstractions;
+﻿using Application.Features.Authentication.Abstractions;
 using FluentResults;
 using Grpc.Core;
 using Infrastructure.Extensions;
 using Infrastructure.Grpc.Abstractions;
 using IronForge.Contracts.AuthService;
+using Utility.Result.ResultErrors;
+using Utility.Result.ResultErrors.Enums;
 using LoginRequest = Application.Features.Authentication.Login.LoginRequest;
 using LoginResponse = Application.Features.Authentication.Login.LoginResponse;
 using RefreshTokensResponse = Application.Features.Authentication.RefreshTokens.RefreshTokensResponse;
@@ -34,24 +34,28 @@ public class AuthService(
             rpcRequest,
             "Register");
 
-        if (rpcResponseResult.IsFailed)
+        if (rpcResponseResult.IsSuccess)
         {
-            var requestResult = rpcResponseResult.ToValidationErrorsResult();
-            var grpcError = rpcResponseResult.GetGrpcResultError();
-            if (grpcError.StatusCode == StatusCode.AlreadyExists)
-                requestResult.WithError(new RequestError("User already exists.", HttpStatusCode.Conflict));
-
-            return requestResult;
+            var rpcResponse = rpcResponseResult.Value;
+            return new RegisterResponse(
+                Guid.Parse(rpcResponse.UserId),
+                rpcResponse.AccessToken,
+                rpcResponse.AccessTokenExpiration.ToDateTime(),
+                rpcResponse.RefreshToken,
+                rpcResponse.RefreshTokenExpiration.ToDateTime()
+            );
         }
 
-        var rpcResponse = rpcResponseResult.Value;
-        return new RegisterResponse(
-            Guid.Parse(rpcResponse.UserId),
-            rpcResponse.AccessToken,
-            rpcResponse.AccessTokenExpiration.ToDateTime(),
-            rpcResponse.RefreshToken,
-            rpcResponse.RefreshTokenExpiration.ToDateTime()
-        );
+        var grpcError = rpcResponseResult.GetGrpcResultError();
+        var errorReason = grpcError.StatusCode switch
+        {
+            StatusCode.AlreadyExists => new RequestError("User already exists.", RequestErrorType.AlreadyExists),
+            StatusCode.InvalidArgument => new RequestError("Validation errors.", RequestErrorType.BadRequest),
+            _ => new RequestError("Unknown gRPC error.", RequestErrorType.Internal)
+        };
+
+        var validationErrors = rpcResponseResult.GetValidationErrors();
+        return Result.Fail(errorReason).WithErrors(validationErrors);
     }
 
     public async Task<Result<LoginResponse>> LoginAsync(
@@ -68,17 +72,19 @@ public class AuthService(
             rpcRequest,
             "Login");
 
-        if (rpcResponseResult.IsFailed)
-            return rpcResponseResult.ToResult();
+        if (rpcResponseResult.IsSuccess)
+        {
+            var rpcResponse = rpcResponseResult.Value;
+            return new LoginResponse(
+                Guid.Parse(rpcResponse.UserId),
+                rpcResponse.AccessToken,
+                rpcResponse.AccessTokenExpiration.ToDateTime(),
+                rpcResponse.RefreshToken,
+                rpcResponse.RefreshTokenExpiration.ToDateTime()
+            );
+        }
 
-        var rpcResponse = rpcResponseResult.Value;
-        return new LoginResponse(
-            Guid.Parse(rpcResponse.UserId),
-            rpcResponse.AccessToken,
-            rpcResponse.AccessTokenExpiration.ToDateTime(),
-            rpcResponse.RefreshToken,
-            rpcResponse.RefreshTokenExpiration.ToDateTime()
-        );
+        return rpcResponseResult.ToResult();
     }
 
     public async Task<Result<RefreshTokensResponse>> RefreshTokenAsync(
@@ -91,15 +97,17 @@ public class AuthService(
             rpcRequest,
             "Refresh token");
 
-        if (rpcResponseResult.IsFailed)
-            return rpcResponseResult.ToResult();
+        if (rpcResponseResult.IsSuccess)
+        {
+            var rpcResponse = rpcResponseResult.Value;
+            return new RefreshTokensResponse(
+                rpcResponse.AccessToken,
+                rpcResponse.AccessTokenExpiration.ToDateTime(),
+                rpcResponse.RefreshToken,
+                rpcResponse.RefreshTokenExpiration.ToDateTime()
+            );
+        }
 
-        var rpcResponse = rpcResponseResult.Value;
-        return new RefreshTokensResponse(
-            rpcResponse.AccessToken,
-            rpcResponse.AccessTokenExpiration.ToDateTime(),
-            rpcResponse.RefreshToken,
-            rpcResponse.RefreshTokenExpiration.ToDateTime()
-        );
+        return rpcResponseResult.ToResult();
     }
 }

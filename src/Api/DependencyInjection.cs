@@ -3,6 +3,7 @@ using Api.Infrastructure;
 using Api.Options;
 using FluentValidation;
 using IronForge.Contracts.AuthService;
+using IronForge.Contracts.ProfileService;
 using Microsoft.IdentityModel.Tokens;
 using SharpGrip.FluentValidation.AutoValidation.Mvc.Extensions;
 using Swashbuckle.AspNetCore.Filters;
@@ -57,6 +58,11 @@ public static class DependencyInjection
         {
             var servicesOptions = configuration.GetRequired<ServicesOptions>();
             options.Address = new Uri(servicesOptions.AuthServiceAddress);
+        });
+        services.AddGrpcClient<Profile.ProfileClient>(options =>
+        {
+            var servicesOptions = configuration.GetRequired<ServicesOptions>();
+            options.Address = new Uri(servicesOptions.ProfileServiceAddress);
         });
     }
 

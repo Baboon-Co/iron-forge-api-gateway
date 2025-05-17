@@ -1,5 +1,7 @@
 ﻿using Application.Features.Authentication.Abstractions;
+using Application.Features.Profiles.Abstractions;
 using Infrastructure.Features.Authentication;
+using Infrastructure.Features.Profiles;
 using Infrastructure.Grpc;
 using Infrastructure.Grpc.Abstractions;
 using Microsoft.Extensions.DependencyInjection;
@@ -17,6 +19,7 @@ public static class DependencyInjection
     private static IServiceCollection AddServices(this IServiceCollection services)
     {
         services.AddScoped<IAuthService, AuthService>();
+        services.AddScoped<IProfileService, ProfileService>();
         services.AddScoped<IGrpcCallerService, GrpcCallerService>();
 
         return services;

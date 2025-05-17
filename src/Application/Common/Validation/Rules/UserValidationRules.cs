@@ -4,7 +4,14 @@ namespace Application.Common.Validation.Rules;
 
 public static class UserValidationRules
 {
-    public static IRuleBuilderOptions<T, string> Username<T>(this IRuleBuilder<T, string> ruleBuilder)
+    public static IRuleBuilderOptions<T, string> IsGuid<T>(this IRuleBuilder<T, string> ruleBuilder)
+    {
+        return ruleBuilder
+            .NotEmpty().WithMessage("Guid is required.")
+            .Must(guid => Guid.TryParse(guid, out _)).WithMessage("Guid is not valid.");
+    }
+    
+    public static IRuleBuilderOptions<T, string> Nickname<T>(this IRuleBuilder<T, string> ruleBuilder)
     {
         return ruleBuilder
             .NotEmpty().WithMessage("Username is required.")

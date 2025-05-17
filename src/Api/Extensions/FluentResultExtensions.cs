@@ -1,6 +1,9 @@
 ﻿using System.Net;
 using Application.Common.Errors;
 using FluentResults;
+using Microsoft.AspNetCore.Mvc;
+using Utility.Result.ResultErrors;
+using Utility.Result.ResultErrors.Enums;
 
 namespace Api.Extensions;
 
@@ -15,6 +18,20 @@ public static class FluentResultExtensions
                 g => g.Key,
                 g => g.Select(e => e.Message).ToArray()
             );
+    }
+
+    public static ActionResult<T> ToErrorActionResult<T>(this Result<T> result)
+    {
+        var validationErrors = result.ToValidationErrorsDictionary();
+
+        var requestError = result.GetRequestError();
+        return requestError.Type switch
+        {
+            RequestErrorType.AlreadyExists => new ConflictObjectResult(new ValidationProblemDetails(validationErrors)),
+            RequestErrorType.BadRequest => new BadRequestObjectResult(new ValidationProblemDetails(validationErrors)),
+            RequestErrorType.NotFound => new NotFoundResult(),
+            _ => new StatusCodeResult((int) HttpStatusCode.InternalServerError)
+        };
     }
 
     public static RequestError GetRequestError<T>(this Result<T> result)

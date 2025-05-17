@@ -6,9 +6,9 @@ namespace Infrastructure.Extensions;
 
 public static class FluentResultExtensions
 {
-    public static Result ToValidationErrorsResult<T>(this Result<T> result)
+    public static IEnumerable<ValidationError> GetValidationErrors<T>(this Result<T> result)
     {
-        return Result.Fail(result.Errors.OfType<ValidationError>());
+        return result.Errors.OfType<ValidationError>();
     }
 
     public static GrpcResultError GetGrpcResultError<T>(this Result<T> result)

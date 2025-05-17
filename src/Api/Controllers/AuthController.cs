@@ -1,7 +1,7 @@
-﻿using System.Net;
-using Api.Extensions;
+﻿using Api.Extensions;
 using Application.Features.Authentication.Abstractions;
 using Application.Features.Authentication.Login;
+using Application.Features.Authentication.RefreshTokens;
 using Application.Features.Authentication.Register;
 using Microsoft.AspNetCore.Mvc;
 
@@ -16,15 +16,9 @@ public class AuthController(IAuthService authService) : ControllerBase
     {
         var authResult = await authService.RegisterAsync(request, ct);
 
-        if (authResult.IsSuccess)
-            return StatusCode(StatusCodes.Status201Created, authResult.Value);
-
-        var validationErrors = authResult.ToValidationErrorsDictionary();
-        var requestError = authResult.GetRequestError();
-        if (requestError.StatusCode == HttpStatusCode.Conflict)
-            return Conflict(new ValidationProblemDetails(validationErrors));
-
-        return BadRequest(new ValidationProblemDetails(validationErrors));
+        return authResult.IsSuccess
+            ? StatusCode(StatusCodes.Status201Created, authResult.Value)
+            : authResult.ToErrorActionResult();
     }
 
     [HttpPost("login")]
@@ -45,12 +39,14 @@ public class AuthController(IAuthService authService) : ControllerBase
     }
 
     [HttpPost("refresh")]
-    public async Task<ActionResult<string>> Refresh(CancellationToken ct)
+    public async Task<ActionResult<RefreshTokensResponse>> Refresh(CancellationToken ct)
     {
         if (!HttpContext.Request.Cookies.TryGetValue("refresh_token", out var refreshToken))
             return Unauthorized("Refresh token not found.");
 
-        var response = await authService.RefreshTokenAsync(refreshToken, ct);
-        return Ok(response);
+        var responseResult = await authService.RefreshTokenAsync(refreshToken, ct);
+        return responseResult.IsSuccess
+            ? Ok(responseResult.Value)
+            : responseResult.ToErrorActionResult();
     }
 }
