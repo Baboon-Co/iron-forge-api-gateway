@@ -11,11 +11,16 @@
         <Message Text="Генерация openapi.json (GENERATE_OPENAPI=$(GENERATE_OPENAPI))" Importance="high"/>
         <MakeDir Directories="generated/openapi"/>
         <Exec Command="dotnet swagger tofile --output generated/openapi/openapi.json $(OutputPath)$(AssemblyName).dll v1"
-              EnvironmentVariables="Jwt__Secret=JWT_SECRET_FOR_OPENAPI_GENERATION;Jwt__Issuer=IronForge-AuthService;Jwt__Audience=IronForge-Frontend;SERVICES__AUTHSERVICEADDRESS=http://auth-service:5102"/>
+              EnvironmentVariables="
+              Jwt__Secret=JWT_SECRET_FOR_OPENAPI_GENERATION;
+              Jwt__Issuer=IronForge-AuthService;
+              Jwt__Audience=IronForge-Frontend;
+              SERVICES__AUTHSERVICEADDRESS=http://auth-service:5102;
+              SERVICES__PROFILESERVICEADDRESS=http://profile-service:5202"/>
     </Target>
 
     <ItemGroup>
-        <PackageReference Include="BaboonCo.Utility.Configuration" Version="0.0.3" />
+        <PackageReference Include="BaboonCo.Utility.Configuration" Version="0.0.3"/>
         <PackageReference Include="FluentResults" Version="3.16.0"/>
         <PackageReference Include="FluentResults.Extensions.AspNetCore" Version="0.1.0"/>
         <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="9.0.4"/>
