@@ -1,9 +1,9 @@
 ﻿using System.Net;
 using Application.Common.Errors;
+using BaboonCo.Utility.Result.ResultErrors;
+using BaboonCo.Utility.Result.ResultErrors.Enums;
 using FluentResults;
 using Microsoft.AspNetCore.Mvc;
-using Utility.Result.ResultErrors;
-using Utility.Result.ResultErrors.Enums;
 
 namespace Api.Extensions;
 

@@ -1,13 +1,13 @@
 ﻿using Application.Features.Profiles.Abstractions;
 using Application.Features.Profiles.CreateProfile;
 using Application.Features.Profiles.GetProfile;
+using BaboonCo.Utility.Result.ResultErrors;
+using BaboonCo.Utility.Result.ResultErrors.Enums;
 using FluentResults;
 using Grpc.Core;
 using Infrastructure.Extensions;
 using Infrastructure.Grpc.Abstractions;
 using IronForge.Contracts.ProfileService;
-using Utility.Result.ResultErrors;
-using Utility.Result.ResultErrors.Enums;
 
 namespace Infrastructure.Features.Profiles;
 
@@ -73,8 +73,9 @@ public class ProfileService(
         var grpcError = rpcResponseResult.GetGrpcResultError();
         var errorReason = grpcError.StatusCode switch
         {
-            StatusCode.NotFound => new RequestError("User not found.", RequestErrorType.NotFound),
-            StatusCode.InvalidArgument => new RequestError("Validation errors.", RequestErrorType.BadRequest),
+            StatusCode.NotFound => new RequestError(grpcError.Message, RequestErrorType.NotFound),
+            StatusCode.InvalidArgument => new RequestError(grpcError.Message, RequestErrorType.BadRequest),
+            StatusCode.AlreadyExists => new RequestError(grpcError.Message, RequestErrorType.AlreadyExists),
             _ => new RequestError("Unknown gRPC error.", RequestErrorType.Internal)
         };
 

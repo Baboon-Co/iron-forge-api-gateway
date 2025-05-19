@@ -1,11 +1,11 @@
 ﻿using Application.Features.Authentication.Abstractions;
+using BaboonCo.Utility.Result.ResultErrors;
+using BaboonCo.Utility.Result.ResultErrors.Enums;
 using FluentResults;
 using Grpc.Core;
 using Infrastructure.Extensions;
 using Infrastructure.Grpc.Abstractions;
 using IronForge.Contracts.AuthService;
-using Utility.Result.ResultErrors;
-using Utility.Result.ResultErrors.Enums;
 using LoginRequest = Application.Features.Authentication.Login.LoginRequest;
 using LoginResponse = Application.Features.Authentication.Login.LoginResponse;
 using RefreshTokensResponse = Application.Features.Authentication.RefreshTokens.RefreshTokensResponse;

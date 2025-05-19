@@ -1,13 +1,13 @@
 ﻿using System.Text;
 using Api.Infrastructure;
 using Api.Options;
+using BaboonCo.Utility.Configuration.Options;
 using FluentValidation;
 using IronForge.Contracts.AuthService;
 using IronForge.Contracts.ProfileService;
 using Microsoft.IdentityModel.Tokens;
 using SharpGrip.FluentValidation.AutoValidation.Mvc.Extensions;
 using Swashbuckle.AspNetCore.Filters;
-using Utility.Configuration.Options;
 
 namespace Api;
 
