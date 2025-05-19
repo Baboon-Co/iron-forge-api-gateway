@@ -1,9 +1,5 @@
 ﻿using Application.Features.Authentication.Abstractions;
-using BaboonCo.Utility.Result.ResultErrors;
-using BaboonCo.Utility.Result.ResultErrors.Enums;
 using FluentResults;
-using Grpc.Core;
-using Infrastructure.Extensions;
 using Infrastructure.Grpc.Abstractions;
 using IronForge.Contracts.AuthService;
 using LoginRequest = Application.Features.Authentication.Login.LoginRequest;
@@ -46,16 +42,7 @@ public class AuthService(
             );
         }
 
-        var grpcError = rpcResponseResult.GetGrpcResultError();
-        var errorReason = grpcError.StatusCode switch
-        {
-            StatusCode.AlreadyExists => new RequestError("User already exists.", RequestErrorType.AlreadyExists),
-            StatusCode.InvalidArgument => new RequestError("Validation errors.", RequestErrorType.BadRequest),
-            _ => new RequestError("Unknown gRPC error.", RequestErrorType.Internal)
-        };
-
-        var validationErrors = rpcResponseResult.GetValidationErrors();
-        return Result.Fail(errorReason).WithErrors(validationErrors);
+        return rpcResponseResult.ToResult();
     }
 
     public async Task<Result<LoginResponse>> LoginAsync(

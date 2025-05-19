@@ -9,8 +9,8 @@
     <ItemGroup>
       <PackageReference Include="BaboonCo.AuthService.Client" Version="0.0.4" />
       <PackageReference Include="BaboonCo.ProfileService.Client" Version="0.0.4" />
-      <PackageReference Include="BaboonCo.Utility.Grpc.Client" Version="0.0.2" />
-      <PackageReference Include="baboonco.utility.result" Version="0.0.4" />
+      <PackageReference Include="BaboonCo.Utility.Grpc.Client" Version="0.0.4" />
+      <PackageReference Include="baboonco.utility.result" Version="0.0.5" />
       <PackageReference Include="FluentResults" Version="3.16.0" />
       <PackageReference Include="Grpc.Net.Client" Version="2.71.0" />
       <PackageReference Include="Grpc.Net.ClientFactory" Version="2.71.0" />

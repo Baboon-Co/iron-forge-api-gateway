@@ -1,4 +1,5 @@
-﻿using Api.Extensions;
+﻿using System.Net;
+using Api.Extensions;
 using Application.Features.Profiles.Abstractions;
 using Application.Features.Profiles.CreateProfile;
 using Application.Features.Profiles.GetProfile;
@@ -29,7 +30,7 @@ public class ProfileController(IProfileService profileService) : ControllerBase
     {
         var result = await profileService.CreateUserProfileAsync(request, ct);
         return result.IsSuccess
-            ? Created($"/api/profiles/{request.Nickname}", result.Value)
+            ? Created(WebUtility.UrlEncode($"/api/profiles/{request.Nickname}"), result.Value)
             : result.ToErrorActionResult();
     }
 }

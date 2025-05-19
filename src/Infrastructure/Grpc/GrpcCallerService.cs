@@ -1,6 +1,5 @@
-﻿using Application.Common.Errors;
+﻿using BaboonCo.Utility.Grpc.Client;
 using FluentResults;
-using Google.Rpc;
 using Grpc.Core;
 using Infrastructure.Grpc.Abstractions;
 using Microsoft.Extensions.Logging;
@@ -47,43 +46,13 @@ public class GrpcCallerService : IGrpcCallerService
         {
             _logger.LogInformation(e, "[gRPC] {Operation} failed: {Status} {Detail}",
                 operationName, e.StatusCode, e.Status.Detail);
-            
-            return ParseGrpcErrors(e);
+
+            return GrpcClientHelper.ParseGrpcErrors(e);
         }
         catch (Exception e)
         {
             _logger.LogError(e, "[gRPC] {Operation} failed with unexpected error", operationName);
             throw;
         }
-    }
-
-    private static Result ParseGrpcErrors(RpcException e)
-    {
-        var status = e.GetRpcStatus();
-        if (status is null)
-            throw new InvalidOperationException("[gRPC] Could not parse gRPC status because it is null.");
-
-        var errors = new List<Error> {new GrpcResultError {StatusCode = e.StatusCode}};
-        foreach (var detail in status.Details)
-        {
-            if (detail.Is(BadRequest.Descriptor))
-            {
-                var badRequest = detail.Unpack<BadRequest>();
-                var validationErrors = badRequest.FieldViolations
-                    .Select(fv => new ValidationError(fv.Field, fv.Description));
-                errors.AddRange(validationErrors);
-            }
-            else if (detail.Is(ErrorInfo.Descriptor))
-            {
-                var info = detail.Unpack<ErrorInfo>();
-                errors.Add(new ErrorInfoError(
-                    info.Reason,
-                    info.Domain
-                ).WithMetadata(info.Metadata
-                    .ToDictionary(kv => kv.Key, m => (object) m.Value)));
-            }
-        }
-
-        return Result.Fail(errors);
     }
 }

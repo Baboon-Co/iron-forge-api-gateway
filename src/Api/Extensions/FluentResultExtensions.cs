@@ -1,6 +1,6 @@
 ﻿using System.Net;
-using Application.Common.Errors;
-using BaboonCo.Utility.Result.ResultErrors;
+using BaboonCo.Utility.Grpc.Client.Errors;
+using BaboonCo.Utility.Result.Extensions;
 using BaboonCo.Utility.Result.ResultErrors.Enums;
 using FluentResults;
 using Microsoft.AspNetCore.Mvc;
@@ -23,19 +23,16 @@ public static class FluentResultExtensions
     public static ActionResult<T> ToErrorActionResult<T>(this Result<T> result)
     {
         var validationErrors = result.ToValidationErrorsDictionary();
-
         var requestError = result.GetRequestError();
+
         return requestError.Type switch
         {
-            RequestErrorType.AlreadyExists => new ConflictObjectResult(new ValidationProblemDetails(validationErrors)),
-            RequestErrorType.BadRequest => new BadRequestObjectResult(new ValidationProblemDetails(validationErrors)),
+            RequestErrorType.AlreadyExists => new ConflictObjectResult(
+                new ValidationProblemDetails(validationErrors) {Detail = requestError.Message}),
+            RequestErrorType.BadRequest => new BadRequestObjectResult(
+                new ValidationProblemDetails(validationErrors)),
             RequestErrorType.NotFound => new NotFoundResult(),
             _ => new StatusCodeResult((int) HttpStatusCode.InternalServerError)
         };
-    }
-
-    public static RequestError GetRequestError<T>(this Result<T> result)
-    {
-        return result.Errors.OfType<RequestError>().First();
     }
 }
