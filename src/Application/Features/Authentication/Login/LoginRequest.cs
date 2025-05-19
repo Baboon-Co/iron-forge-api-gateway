@@ -18,7 +18,7 @@ internal class LoginRequestSchemaFilter : ISchemaFilter
         schema.Example = new OpenApiObject
         {
             ["login"] = new OpenApiString("alpaca"),
-            ["password"] = new OpenApiString("cake"),
+            ["password"] = new OpenApiString("cakeCAKE!1"),
         };
     }
 }
